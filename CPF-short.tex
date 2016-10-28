@@ -1,0 +1,43 @@
+\documentclass[11pt]{article}
+\usepackage{fontspec}
+\usepackage{fullpage}
+\usepackage{hyperref}
+\title{Continuation power flow in short}
+\date{\today}
+\author{Camille Hamon}
+\begin{document}
+\maketitle
+
+\section*{What you need}
+\begin{enumerate}
+\item An initial operating point $x^0=[\theta^0 \; V^0]$, for example obtained after a power flow computations.
+\item A direction of load increase $d$ (see slides).
+\end{enumerate}
+
+\section*{How to proceed}
+\begin{enumerate}
+\item Start at $x_i=x^0$, set $k=2n+1$ and $\lambda_i=0$. Choose a step length $s$.
+\item \textbf{While} $\lambda_i >0$, \textbf{do}:
+  \begin{enumerate}
+  \item Given $k$, $x_i$ and $\lambda_i$, compute the tangent with the formula on the slide.
+  \item Choose parameter $k$ with the formula on the slide.
+  \item Take a step from $x_i$ and $\lambda_i$ in the tangent direction to get a predicted point.
+  \item Given $k$ and the predicted point, correct the prediction to get $x_{i+1}$ and $\lambda_{i+1}$ (Newton-Raphson method).
+  \item Set $i=i+1$ and continue.
+  \end{enumerate}
+\end{enumerate}
+
+\section*{Notes}
+
+\begin{enumerate}
+\item Usually, the algorithm starts with $k$ corresponding to $\lambda$ and switches to $k$ corresponding to one of the voltage magnitudes before reaching the nose point. Once the nose point is passed, it then switches back to $\lambda$. So $\lambda$ increases until the nose point and decreases again as we trace the lower part of the PV curves.
+\item You can access Ajjarapu's book from the NTNU network: \url{http://link.springer.com/book/10.1007/978-0-387-32935-2}. In Chapter 3, ``Continuation power flow'', examples in simple systems are given. Note, however, that the way the load increase is defined in these examples is slightly different from the way it was defined in the lecture.
+\end{enumerate}
+\end{document}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-engine: luatex
+%%% TeX-master: t
+%%% End:

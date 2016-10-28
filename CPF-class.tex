@@ -1,0 +1,671 @@
+\documentclass{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{csquotes}
+\usepackage{tikz,pgfplots}
+\pgfplotsset{compat=newest}
+\pgfplotsset{plot coordinates/math parser=false}
+\usepackage{booktabs}
+\usepackage{hyperref}
+
+% Beamer Settings
+\usetheme{Frankfurt}
+\setbeamertemplate{items}[circle]
+\setbeamertemplate{enumerate items}[default]
+\setbeamertemplate{blocks}[rounded][shadow=false]
+\setbeamertemplate{navigation symbols}{}
+\setbeamercovered{transparent}
+
+
+\newcommand*{\field}[1]{\mathbb{#1}}
+\newcommand*{\R}{\field{R}} % real R
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\newcommand\norm[1]{\left\lVert#1\right\rVert}
+\newlength\fheight 
+\newlength\fwidth 
+\setlength\fheight{0.4\textheight} 
+\setlength\fwidth{0.4\textwidth}
+
+\usepackage{remreset}% tiny package containing just the \@removefromreset command, to view circles for slides in Frankfurt theme
+\makeatletter
+\@removefromreset{subsection}{section}
+\makeatother
+\setcounter{subsection}{1}
+
+\AtBeginSection[]
+{
+   \begin{frame}
+        \frametitle{Agenda}
+        \tableofcontents[currentsection]
+   \end{frame}
+}
+
+\title{Continuation Power Flow\\Advanced power system analysis}
+\author{Camille Hamon\\camille.hamon@ntnu.no}
+\date{13 October 2015}
+
+% \AtBeginSection[] % Do nothing for \subsection*
+% {
+% \begin{frame}<beamer>
+% \frametitle{Outline}
+% \tableofcontents[currentsection,subsectionstyle=hide]
+% \end{frame}
+% }
+
+\begin{document}
+\begin{frame}[plain]
+  \titlepage
+
+\blockquote[\textbf{January 1989}, EPRI, “Proceedings: Bulk Power System Voltage Phenomena - Voltage Stability and Security.”]{Over the past decade, voltage instability has initiated several severe power system disruptions. Such incidents are likely to increase with increases in transmission line loadings. However, no theoretical or practical body of knowledge is available to meet the needs of power system planners and operators}
+\end{frame}
+
+\begin{frame}{Outline}
+  \tableofcontents[subsectionstyle=hide]
+\end{frame}
+
+\section[Volt. Stab.]{Voltage stability}
+
+\subsection{Recap}
+
+
+\begin{frame}
+  \frametitle{Voltage stability}
+  \begin{itemize}
+  \item Load dynamics are critical to study voltage stability.
+  \item There is a loading point beyond which the system becomes unstable. (What happens beyond this point?)
+  \end{itemize}
+\input{PVcurve}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Voltage stability, cont.}
+  \begin{itemize}
+  \item What does loading mean? What does it mean to \emph{increase the loading}?
+  \item How to get the nose point?
+  \item How to get the rest of the curve?
+  \item Why are we interested in these quantities?
+  \item How is this information typically used in operation and planning?
+  \end{itemize}
+\setlength\fheight{0.3\textheight} 
+\setlength\fwidth{0.6\textwidth}
+\input{PVcurve}
+\end{frame}
+
+\subsection{Example}
+
+\begin{frame}[label=example]
+\frametitle{Example of voltage instability - 1}
+There is a \alert{loading} point beyond which the system becomes unstable.
+How to define a \alert{loading} and a \alert{loading increase} in power systems?
+\begin{columns}
+\column{0.5\textwidth}
+\includegraphics[width=\textwidth]{Figs/Ieee9bus.pdf}
+\column{0.5\textwidth}
+\input{CPFieee9}
+\end{columns}
+\end{frame}
+
+\begin{frame}[label=exampledir]
+\frametitle{Example of voltage instability - 2}
+\begin{columns}
+\column{0.5\textwidth}
+\includegraphics[width=\textwidth]{Figs/Ieee9bus.pdf}
+\column{0.5\textwidth}
+\input{CPFieee9_3}
+Solid=All loads increase by the same amount\\
+Dashed=Load A increases double as much as the other two.
+\end{columns}
+\end{frame}
+
+\begin{frame}[label=examplecont]
+\frametitle{Example of voltage instability - 3}
+\begin{columns}
+\column{0.5\textwidth}
+\includegraphics[width=\textwidth]{Figs/Ieee9bus_fault89.pdf}
+\column{0.5\textwidth}
+\input{CPFieee9_cont89}
+Solid=System intact\\
+Dashed=Fault on line between buses 8 and 9.
+\end{columns}
+\end{frame}
+
+
+\section{History}
+
+\begin{frame}
+  \frametitle{History}
+\textbf{January 1989}, EPRI, “Proceedings: Bulk Power System Voltage Phenomena - Voltage Stability and Security.”
+  \begin{quote}
+    Over the past decade, voltage instability has initiated several severe power system disruptions. Such incidents are likely to increase with increases in transmission line loadings. However, no theoretical or practical body of knowledge is available to meet the needs of power system planners and operators
+  \end{quote}
+\end{frame}
+
+\begin{frame}
+  \frametitle{History, cont.}
+  \begin{itemize}
+  \item \textbf{September 1989}: Dobson and Chiang, “Towards a Theory of Voltage Collapse in Electric Power Systems.”
+  \item \textbf{October 1989}: Ajjarapu and Christy, “The Application of a Locally Parameterized Continuation Technique to the Study of Steady State Voltage Stability.”
+  \item \textbf{1992}: Ajjarapu and Christy, “The Continuation Power Flow: A Tool for Steady State Voltage Stability Analysis.”
+  \item \textbf{1992}: Dobson and Lu, “Voltage Collapse Precipitated by the Immediate Change in Stability When Generator Reactive Power Limits Are Encountered.”
+  \item \textbf{1998}: Van Cutsem and Vournas, Voltage Stability of Electric Power Systems.
+  \item \textbf{2007}: Ajjarapu, Computational Techniques for Voltage Stability Assessment and Control.
+  \end{itemize}
+And many, many other contributors \ldots
+\end{frame}
+
+
+\section[NR method]{Newton-Raphson method}
+\label{sec:newt-raphs-meth}
+
+
+\begin{frame}
+  \frametitle{Newton-Raphson method}
+  \begin{itemize}
+  \item Method to compute $x^{*}$ such that $f(x^{*}) = 0$.
+  \item Requires an initial guess.
+  \item Relies on a first-order approximation of $f$ around the current guess $x_i$:
+    \begin{align}
+      f(x) = f(x_i) + \nabla_x f(x_i) (x-x_i) + \text{ higher order term}
+    \end{align}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Newton-Raphson method, algorithm}
+  \begin{enumerate}
+  \item Set $x_i = x_0$;
+  \item \textbf{While} $\norm{f(x_i)}> \epsilon$, \textbf{do}
+    \begin{align}
+      \label{eq:2}
+      x_{i+1} = x_i - \left(\nabla_x f(x_i) \right)^{-1} f(x_i)
+    \end{align}
+  \item Hope that you guessed $x_0$ right so that the method converges.
+  \end{enumerate}
+\end{frame}
+
+\section[Power flow]{Power flow computations by Newton-Raphson method}
+
+\begin{frame}
+  \frametitle{Power flow computations}
+  \begin{itemize}
+  \item \textbf{Objective}: \only<1>{?} \only<2->{Find voltage magnitudes and angles at all buses, given power injections, voltage set points and angle references at some buses.}
+  \item<3-> \textbf{Method}: Active and reactive power balance at each bus must hold.
+    \begin{align}
+      \Delta P &= P_g - P_l - P_s(\theta,V) = 0,\\
+      \Delta Q &= Q_g - Q_l - Q_s(\theta,V) = 0,
+    \end{align}
+  \item<4> Can be written
+    \begin{align}
+      x &= [\theta \; V] \\
+      f(x) &= \begin{bmatrix}
+      \Delta P(x)\\
+      \Delta Q(x)
+      \end{bmatrix}=0
+    \end{align}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[label=nr-power-flow]
+  \frametitle{Newton-Raphson iteration for power flows}
+The power flow equations $f(x)=0$ can be solved by the Newton-Raphson method. Iterations:
+  \begin{align}
+      x_{i+1} = [\theta_{i+1} \; V_{i+1}] = x_i - J(x_i)^{-1} f(x_i)
+  \end{align}
+with ($i$ is for iteration number, \emph{not} bus number)
+\begin{align}
+  J(x_i) = J([\theta_i \; V_i]) = \begin{bmatrix}
+     \frac{\partial \Delta P}{\partial \theta} & \frac{\partial \Delta P}{\partial V} \\
+     \frac{\partial \Delta Q}{\partial \theta} & \frac{\partial \Delta Q}{\partial V}
+   \end{bmatrix} = \begin{bmatrix}
+   f_{\theta} & f_V
+   \end{bmatrix}
+\end{align}
+So why can't we use power flow computations for obtaining the PV curves?\\
+\visible<2>{
+\begin{enumerate}
+\item The Jacobian is singular at the nose point $\Rightarrow$ numerical problems as we get close to this point. 
+\item Convergence of NR method very sensitive to initial conditions $\Rightarrow$ can be difficult to get convergence even away from the nose point.
+\end{enumerate}
+}
+\end{frame}
+
+\section[CPF]{Continuation power flow}
+\label{sec:cont-power-flow}
+\subsection{Parametrizing the loading increase}
+\begin{frame}
+  \frametitle{Parametrization of load increase}
+There is a \alert{loading} point beyond which the system becomes unstable.
+How to define a \alert{loading} and a \alert{loading increase} in power systems?
+  \begin{itemize}
+  \item Add one parameter $\lambda \in \R$ to parametrize the load increase process in direction $d\in \R^n$:
+    \begin{align}
+      P_l = P_l^0 + \lambda d \in \R^n
+    \end{align}
+  \item For example, in a three-bus system with two loads at buses 2 and 3, the loads could be increased as follows
+    \begin{align}
+      P_l =
+      \begin{bmatrix}
+        0 \\
+        150 \\
+        120
+      \end{bmatrix} + \lambda
+      \begin{bmatrix}
+        0 \\
+        1\\
+        1
+      \end{bmatrix}
+    \end{align}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Parametrization of load increase, cont.}
+  \begin{itemize}
+  \item Reactive power: typically, we assume constant power factor load (but the method can handle other models as well), so
+    \begin{align}
+      Q_l = \text{diag}(\tan \phi) P_l = Q_l^0 + \lambda \cdot \text{diag}(\tan \phi) d 
+    \end{align}
+  \item Note that $\text{diag} (\tan \phi)$ is simply a square matrix with the $\tan \phi_i$ on the diagonal
+  \item For example, with $\tan \phi = Q_0/P_0 = 0.5$ for all loads, 
+    \begin{align}
+      Q_L =
+      \begin{bmatrix}
+        0\\
+        75\\
+        60
+      \end{bmatrix} + \lambda
+      \begin{bmatrix}
+        0\\
+        0.5\\
+        0.5
+      \end{bmatrix}
+    \end{align}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Illustration on the board}
+  Two-dimensional load increase from $P_l^0$ in direction $d$.
+  \includegraphics[angle=90,width=0.7\textwidth]{Figs/LoadIncrease.jpg}
+
+\textbf{Note:} Important to keep in mind which space ($V-\lambda$, $P_l$, etc.) is of interest.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Extending the power flow equations}
+\begin{align}
+      0 &= P_g^i - P_l^i - P_s^i(\theta,V), \quad \forall \text{ PV and PQ buses} \label{eq:pf-p} \\
+      0 &= Q_g^i - Q_l^i - Q_s^i(\theta,V), \quad \forall \text{ PQ buses} \label{eq:pf-q}\\
+      P_l &= P_l^0 + \lambda d \in R^n \label{eq:cpf-lambda} \\
+      Q_l &= Q_l^0 + \lambda \cdot \text{diag}(\tan \phi) d \label{eq:cpf-lambda-q}
+    \end{align}
+    \begin{center}
+    \begin{tabular}{ccc}
+    \toprule
+      & PF & CPF \\
+    \midrule
+    Equations & \eqref{eq:pf-p}, \eqref{eq:pf-q} & \eqref{eq:pf-p}, \eqref{eq:pf-q}, \eqref{eq:cpf-lambda}, \eqref{eq:cpf-lambda-q}\\
+    Variables & $x = [\theta \; V]$ & $z = [x \; \lambda] = [\theta \; V \; \lambda]$ \\
+    Parameters & $P_l$, $\tan \phi$ & $P_l^0$, $\tan \phi$, $d$, $\lambda$ \\
+     & (and $P_g$, $\theta_{\text{slack}}$, \ldots) & (and $P_g$, $\theta_{\text{slack}}$, \ldots) \\
+    \bottomrule
+    \end{tabular}  
+    \end{center}
+Increasing $\lambda \Leftrightarrow$ simulating a load increase in direction $d$.
+\end{frame}
+
+\subsection{CPF: the thee steps}
+
+\begin{frame}
+  \frametitle{CPF: Principles}
+The CPF is a predictor-corrector process:
+\begin{enumerate}
+\item Start from an operating point $z_i = [\theta_i \; V_i \; \lambda_i]$.
+\item Predict what the operating point becomes when loading increases in direction $d$ $\Rightarrow$ $z_{i+1}^p$.
+\item Correct the prediction to get a real operating point $z_{i+1}$.
+\end{enumerate}
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.4\textwidth]{CPFprocess.pdf}
+  \caption{CPF process, from Ajjarapu and Christy, “The Continuation Power Flow: A Tool for Steady State Voltage Stability Analysis.”}
+  \label{fig:CPFprocess}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Steps in CPF}
+Three main steps:
+\begin{enumerate}
+\item Predictor step: From a known operating point $z_i$ (ex: previously corrected), take a step in the direction of the tangent vector $t_{i}$.
+  \begin{align}
+  z_{i+1}^p = [\theta_{i+1} \; V_{i+1} \; \lambda_{i+1} ]= z_{i} + s \cdot t_{i}  
+  \end{align}
+\end{enumerate}
+\textbf{Notes:}
+\begin{itemize}
+\item  The predicted point does not correspond to a physical operating point. 
+\item It is a mathematical construction to estimate the values of $z=[\theta \; V \; \lambda]$ after taking a step of length $s$ in direction $d$ (in the load space = $P_l$-space).
+\item It gives a good initial guess of $z$ before the corrector step.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Steps in CPF, cont.}
+  \begin{enumerate}
+ \setcounter{enumi}{1}
+  \item Choosing the continuation parameter: which component in $z = [\theta \; V \; \lambda]$ should we keep constant in the corrector step?
+\item Corrector step: Correct the predicted value to a valid operating point (= ``project'' back onto the PV curve), keeping the continuation parameter constant. Solve:
+  \begin{align}
+      0 &= P_g - (P_l^0 + \lambda_{i+1} d) - P_s(\theta_{i+1},V_{i+1}),\label{eq:corr-1}  \\
+      0 &= Q_g - (Q_l^0 + \lambda_{i+1} \cdot \text{diag}(\tan \phi) d)- Q_s(\theta_{i+1},V_{i+1}), \\
+      0 &= z_{i+1}^{k}-z_{i+1}^{k,p} \label{eq:corr-3}
+  \end{align}
+  Equations \eqref{eq:corr-1}--\eqref{eq:corr-3} solved for $z_{i+1} = [\theta_{i+1} \; V_{i+1} \; \lambda_{i+1}]$ by Newton-Raphson method.
+  \end{enumerate}
+\textbf{Notes}:
+\begin{itemize}
+\item Without \eqref{eq:corr-3}, the system of equations is underdetermined.
+\item \eqref{eq:corr-3} says how to correct onto the PV curve (keeping $\lambda$ constant, keeping some $V_m$ constant, \ldots)
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Illustration on the board}
+  \includegraphics[width=0.7\textwidth]{Figs/CPF_cont_param.jpg}
+\end{frame}
+
+\subsection{The three steps in detail}
+
+\begin{frame}
+  \frametitle{Predictor step, details}
+  From a known operating point $z_i$ (ex: previously corrected), take a step in the direction of the tangent vector $t_{i}$.
+  \begin{align}
+  z_{i+1}^p = [\theta_{i+1} \; V_{i+1} \; \lambda_{i+1} ]= z_{i} + s \cdot t_{i}  
+  \end{align}
+\textbf{Question:} How is defined the tangent vector?
+
+
+\textbf{More general question:} How to compute \emph{one} tangent vector to a surface described by $g(u) = 0$?
+
+\textbf{Notes:}
+\begin{itemize}
+\item $t_{i}$ is the tangent vector to the operating point $z_i = [\theta_i \; V_i \; \lambda_i]$ defined by the power flow equations $f(z_i) = 0$. 
+\item Notice the space we are talking about. It is the $z$-space, not only the $(V,\lambda)$-space
+\item Where is the direction $d$ here?
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Computing a tangent vector}
+  Equation of the form 
+  \begin{align}
+    \label{eq:4}
+    g(u_0) = 0
+  \end{align}
+Any vector $t$ in the null space of the Jacobian $J(u_0)$ is a tangent vector to $g$ at $u_0$, i.e. any vector $u\neq 0$ such that
+\begin{align}
+  \label{eq:5}
+  J(x_0) t = 0.
+\end{align}
+Intuition,
+\begin{align}
+  \label{eq:6}
+  g(u_0+t) &= g(u_0) + J(u_0) t + \text{ higher order terms}
+\end{align}
+The set of all $u_0+t$ such that $J(u_0) t = 0$ is the tangent plane of $g$ at $u_0$.
+\vskip0.5cm
+\footnotesize See also \url{http://mathworld.wolfram.com/SubmanifoldTangentSpace.html}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Tangent vector to power flow equations}
+  Let $z_i = [\theta_i \; V_i \; \lambda_{i}]$ be an operating point, i.e.
+  \begin{align}
+    \label{eq:7}
+    \Delta P (z_i) &= 0 \\
+    \Delta Q (z_i) &= 0
+  \end{align}
+Any vector $t$ such that
+\begin{align}
+  \label{eq:tangent-vectors}
+  J(z_i)t = \begin{bmatrix}
+  \frac{\partial \Delta P}{\partial \theta} & \frac{\partial \Delta P}{\partial V} & \frac{\partial \Delta P}{\partial \lambda} \\
+  \frac{\partial \Delta Q}{\partial \theta} & \frac{\partial \Delta Q}{\partial V} & \frac{\partial \Delta Q}{\partial \lambda}
+  \end{bmatrix} t = 0
+\end{align}
+is a tangent vector.
+
+\textbf{Note:} We cannot just solve $J(z_i) t = 0$ for $t$ to find $t$ (i.e. \eqref{eq:tangent-vectors} is a necessary but not sufficient condition to get \emph{the} $t$ we are looking for). Why? \only<2>{Ex: $t$ = 0 satisfies \eqref{eq:tangent-vectors}.}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Tangent vector to power flow equations, cont.}
+  \begin{itemize}
+  \item We need one more equation to specify which tangent vector, among all possible satisfying \eqref{eq:tangent-vectors}, we want to obtain.
+  \item Typically, we want one component $k$ in $v$ to be equal to one, so 
+    \begin{align}
+      \label{eq:10}
+      t_k = \pm 1
+    \end{align}
+  \end{itemize}
+ Combining everything:
+\begin{align}
+  \begin{bmatrix}
+  \frac{\partial \Delta P}{\partial \theta} & \frac{\partial \Delta P}{\partial V} & \frac{\partial \Delta P}{\partial \lambda} \\
+  \frac{\partial \Delta Q}{\partial \theta} & \frac{\partial \Delta Q}{\partial V} & \frac{\partial \Delta Q}{\partial \lambda} \\
+   & e_k^T & 
+  \end{bmatrix} t = \pm e_{2n+1}
+\end{align}
+where $e_j$ is the $j$-th column of the identity matrix $I_{2n+1}$.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Tangent vector, summary}
+Combining everything:
+\begin{align}
+  \label{eq:tangent-vectors-2}
+  \begin{bmatrix}
+  \frac{\partial \Delta P}{\partial \theta} & \frac{\partial \Delta P}{\partial V} & \frac{\partial \Delta P}{\partial \lambda} \\
+  \frac{\partial \Delta Q}{\partial \theta} & \frac{\partial \Delta Q}{\partial V} & \frac{\partial \Delta Q}{\partial \lambda} \\
+   & e_k^T & 
+  \end{bmatrix} t = Bt = \pm e_{2n+1}
+\end{align}
+where $e_j$ is the $j$-th column of the identity matrix $I_{2n+1}$, and $B$ is just the matrix on the left.
+
+\textbf{Solving \eqref{eq:tangent-vectors-2}}: Simply use the inverse of matrix on the left: $t = B^{-1} (\pm e_{2n+1})$.
+
+\textbf{Interpretation:} By following $t$, the $k$-th component in $z$ changes with 1 or -1, the other ones change with $t_j$, $j \neq k$, where these $t_j$ are computed from \eqref{eq:tangent-vectors-2} to make sure that the step we take is in the tangent plane around the current operating point $z_i$.
+
+\textbf{Question:} Where is the direction $d$?  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Tangent vector, example}
+  Matlab example.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Choosing the continuation parameter}
+  \begin{itemize}
+  \item Previously: predictor step gave $t$ and $z_{i+1}^p = z_i + s \cdot t$
+  \item Problem: $z_{i+1}^p$ does not satisfy power flow equations (it satisfies them only to the first order, in fact).
+  \item Now: correct the prediction to get an operating point satisfying the power flow equations.
+\item Remember, in the next step, the correction step, some component of $z=[\theta \; V \; \lambda]$ will be kept constant:
+\begin{align}
+      0 &= P_g - (P_l^0 + \lambda_{i+1} d) - P_s(\theta_{i+1},V_{i+1}),\\
+      0 &= Q_g - (Q_l^0 + \lambda_{i+1} \cdot \text{diag}(\tan \phi) d)- Q_s(\theta_{i+1},V_{i+1}), \\
+      0 &= z_{i+1}^{k}-z_{i+1}^{k,p} \label{eq:corr-param}
+\end{align}
+  \end{itemize}
+\textbf{Intuition:}
+\begin{itemize}
+\item we want to have control over the component that varies the fastest when taking a step.
+\item How to choose among all $\theta$, $V$ and $\lambda$ the one we want to keep constant?
+\item Hints: it is related to the tangent vector $t$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Choosing the continuation parameter, cont.}
+\begin{align}
+  \begin{bmatrix}
+  \frac{\partial \Delta P}{\partial \theta} & \frac{\partial \Delta P}{\partial V} & \frac{\partial \Delta P}{\partial \lambda} \\
+  \frac{\partial \Delta Q}{\partial \theta} & \frac{\partial \Delta Q}{\partial V} & \frac{\partial \Delta Q}{\partial \lambda} \\
+   & e_k^T & 
+  \end{bmatrix} t = \pm e_{2n+1}
+\end{align}
+  \begin{itemize}
+  \item Remember: Each component in $t$ is associated with either one bus voltage angle $\theta_j$, one bus voltage magnitude $V_j$ or the loading $\lambda$.
+  \item The components in the tangent vector $t$ indicates how all variables $\theta$, $V$ and $\lambda$ vary when we take a step.
+  \item We choose $k$ corresponding to the component with maximum variation:
+    \begin{align}
+      \label{eq:1}
+      k = \argmax \{|t_1|,\ldots,|t_{2n+1}|\}
+    \end{align}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Correction step, details}
+  \begin{itemize}
+  \item Previously:
+    \begin{enumerate}
+    \item $z_{i+1}^p$: predicted value = approximation of the operating point when taking a step from $z_i$ in direction $p$.
+    \item $k$: the variable, among all $\theta$, $V$ and $\lambda$, that is kept constant during the correction step.
+    \end{enumerate}
+  \item Corrector step ``easy'': we just need to solve:
+\begin{align}
+      0 &= P_g - (P_l^0 + \lambda_{i+1} d) - P_s(\theta_{i+1},V_{i+1}),\\
+      0 &= Q_g - (Q_l^0 + \lambda_{i+1} \cdot \text{diag}(\tan \phi) d)- Q_s(\theta_{i+1},V_{i+1}), \\
+      0 &= z_{i+1}^{k}-z_{i+1}^{k,p}
+\end{align}
+\textbf{Question:} How to solve this? \only<2>{using Newton-Raphson method}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Corrector step with Newton-Raphson}
+\begin{align}
+      0 &= P_g - (P_l^0 + \lambda_{i+1} d) - P_s(\theta_{i+1},V_{i+1}), \label{eq:corr-eq-1}\\
+      0 &= Q_g - (Q_l^0 + \lambda_{i+1} \cdot \text{diag}(\tan \phi) d)- Q_s(\theta_{i+1},V_{i+1}), \\
+      0 &= z_{i+1}^{k,p} - z_{i+1}^{k} \label{eq:corr-eq-3}
+\end{align}
+\begin{itemize}
+\item Newton-Raphson with $z_{i+1}^p$ as initial guess
+\item $j$-th iteration in Newton-Raphson:
+\begin{align}
+  \label{eq:3}
+  z_{i+1,j+1} = - J_\text{aug}(z_{i+1,j})^{-1} f(z_{i+1,j})
+\end{align}
+where the Jacobian of \eqref{eq:corr-eq-1}--\eqref{eq:corr-eq-3} is
+\begin{align}
+  \label{eq:8}
+  J_\text{aug}(z_{i+1,j}) = \begin{bmatrix}
+  \frac{\partial \Delta P}{\partial \theta} & \frac{\partial \Delta P}{\partial V} & \frac{\partial \Delta P}{\partial \lambda} \\
+  \frac{\partial \Delta Q}{\partial \theta} & \frac{\partial \Delta Q}{\partial V} & \frac{\partial \Delta Q}{\partial \lambda} \\
+   & e_k^T & 
+  \end{bmatrix}
+\end{align}
+\end{itemize}
+\textbf{Note:} Easy to mix up all indices ($i$,$k$,$j$)!
+\end{frame}
+
+\subsection{Problems addressed by CPF}
+
+\begin{frame}
+  \frametitle{Around the nose point}
+Remember: the maximum loadability point is characterized by singularity of the power flow Jacobian $J$ (i.e. $\det J = 0$):
+\begin{align}
+  \label{eq:9}
+  J = \begin{bmatrix}
+  \frac{\partial \Delta P}{\partial \theta} & \frac{\partial \Delta P}{\partial V} \\
+  \frac{\partial \Delta Q}{\partial \theta} & \frac{\partial \Delta Q}{\partial V}
+  \end{bmatrix}
+\end{align}
+Note that the Jacobian in the corrector process is
+\begin{align}
+  \label{eq:9}
+  J_\text{aug} = \begin{bmatrix}
+  \begin{matrix} \vphantom{\begin{matrix} 0 \\ 0 \end{matrix}} 
+  J 
+ \end{matrix} & \begin{matrix} \frac{\partial \Delta P}{\partial \lambda_i} \\
+  \frac{\partial \Delta Q}{\partial \lambda}
+  \end{matrix} \\
+   & e_k^T & 
+  \end{bmatrix}
+\end{align}
+If we choose $\lambda$ as the continuation parameter, $\det J_\text{aug} = \det J$.
+Close to the nose point, $J_\text{aug}$ would also be close to singular.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Importance of the continuation parameter}
+  The continuation parameter helps in two different ways
+  \begin{enumerate}
+  \item Predictor step: $t_k = \pm 1$ helps controlling the fastest changing variable when we take a step.
+  \item Corrector step: Choosing another continuation parameter than $\lambda$ ensures that the corrector step is numerically stable (Jacobian in the Newton-Raphson process not close to singular)
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{Why does it help?}
+So, why does it help?
+
+Remember, problems with using PF calculations to trace the PV curve:
+\begin{enumerate}
+\item PF convergence very sensitive to initial conditions $\Rightarrow$ CPF uses a predictor step to get a good initial (=predicted) value.
+\item The PF Jacobian is singular at the nose point $\Rightarrow$ numerical problems as we get close to this point $\Rightarrow$ Continuation parameter is set to ensure nonsingularity of the Jacobian matrix.
+\end{enumerate}
+\end{frame}
+
+\section{Extras}
+
+\begin{frame}
+  \frametitle{Demo}
+  Matlab demo.
+\end{frame}
+
+\begin{frame}
+  \frametitle{What we haven't talked about}
+  \begin{itemize}
+  \item Reactive power limits.
+  \item How to choose the step size $s$.
+  \item How to interpret and use the tangent vector.
+  \item Other load models.
+  \item Incorporating load dynamics, generator dynamics, etc
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Inspiration}
+  \begin{itemize}
+  \item Voltage stability phenomena explained by bifurcation theory (dynamical system). Nose point = saddle-node bifurcation.
+  \item Continuation methods come from that field.
+  \item Applied by Werner Rheinboldt in the field of structural mechanics.
+  \item The work of Rheinboldt inspired Ajjarapu and Christy to adapt the method to the study of voltage stability.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Take-home messages}
+  \begin{itemize}
+  \item Understand the Newton-Raphson method and how to use it.
+  \item The principles of and intuition behind CPF are simple.
+  \item The maths are important. Link intuition to maths! Important to be able to write down intuitions as mathematical formulations.
+  \item Keep track of what has a physical meaning and what is just math (predictor step, for example, is a mathematical construction, although the tangent vector does have a physical interpretation)
+  \item Keep track of indices, variables, Jacobians \ldots Easy to get lost!
+  \item Always make sure you understand the physics (i.e. what are we talking about, what is going on in the system, what is reactive power, \ldots)
+  \item When encountering a new problem, study other fields.
+  \end{itemize}
+\end{frame}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
