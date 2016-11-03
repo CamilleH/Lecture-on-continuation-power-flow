@@ -1,0 +1,11 @@
+*.tex#
+*.tex
+*.aux
+*.nav
+*.out
+*.snm
+*.gz
+*.tex~
+*.toc
+*.asv
+*.el

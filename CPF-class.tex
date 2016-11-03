@@ -71,6 +71,25 @@
 
 \subsection{Recap}
 
+\begin{frame}
+  \frametitle{PV and QV curves}
+  
+\end{frame}
+
+\begin{frame}
+  \frametitle{The onion curve}
+  \begin{itemize}
+\item A lossless two-bus system (single-load infinite-bus systeme) is used for illustration purposes \textbf{only}.
+\item Infinite bus: voltage = $Ee^{j0}$.
+\item Load bus: load $S = P+jQ$.
+\item Transmission line: resistance = 0, reactance = X.
+\item Closed-form solution of the voltage magnitude at the load bus:
+  \begin{align}
+    \label{eq:11}
+    \frac{V}{E} = \sqrt{\frac{1}{2}-\frac{QX}{E^2} \pm \sqrt{\frac{1}{4}-\left( \frac{XP}{E^2} \right)^2 - \frac{XQ}{E^2}}}
+  \end{align}
+  \end{itemize}
+\end{frame}
 
 \begin{frame}
   \frametitle{Voltage stability}
@@ -96,6 +115,89 @@
 \end{frame}
 
 \subsection{Example}
+
+\begin{frame}
+\frametitle{Stability constraints (remember?)}
+\begin{block}{Power system perspective}
+Typically, stability constraints take the form of active power limits on critical interfaces (=transmission corridors / lines). 
+
+\begin{columns}
+\begin{column}{0.3\textwidth}
+\includegraphics[width=1\textwidth]{Figs/Hasle.png}    
+\end{column}
+\begin{column}{0.3\textwidth}
+\includegraphics[width=1\textwidth]{Figs/SecurityLimits.png}
+\end{column}
+\end{columns}  
+\end{block}
+\begin{block}{Math formulation}
+  \begin{align*}
+    P_l \leq P_l^{\text{max}}, \; \forall \text{ critical interfaces } l.
+  \end{align*}
+\underline{Note:} \emph{same math formulation as thermal limits but fundamentally different constraints!}
+\end{block}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Example from Sweden: Using CPF for security management.}
+  \begin{columns}
+    \column{0.5\textwidth}
+    \begin{itemize}
+    \item Four price areas separated by bottlenecks (=critical transmission corridors).
+    \item \textbf{Security assessment} The TSO monitors the power transfers across the bottlenecks. 
+    \item \textbf{Security enhancement} The TSO sends re-dispatch orders (increase/decrease production) if necessary.
+    \end{itemize}
+    \column{0.5\textwidth}
+  \begin{tikzpicture}
+\pgftext{\includegraphics[width=0.55\textwidth]{Figs/Snitten.jpg}}
+{\footnotesize
+\node at (2.3,2) {Price area SE1};
+\node at (1.5,0.25) {Price area SE2};
+\node at (1.5,-1.5) {Price area SE3};
+\node at (1,-2.5) {Price area SE4};
+}
+\end{tikzpicture}
+  \end{columns}
+  \begin{block}{}
+What does ``monitoring'' mean in this context? What do we monitor, and against what?
+  \end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Example from Sweden - 2}
+\begin{columns}
+\column{0.6\textwidth}
+Security assessment:
+\begin{enumerate}
+\item A list of contingencies is defined.
+\item Every 15 minutes, for each contingency and each bottleneck, transmission limits are computed.
+\item The power transfers are monitored and checked against all computed transmission limits.
+\end{enumerate}
+Security enhancement:
+\begin{enumerate}
+\setcounter{enumi}{3}
+\item If the power transfers come close to one of the computed limits, re-dispatch the generation to decrease the power transfers.
+\end{enumerate}
+\column{0.4\textwidth}
+\begin{center}
+\includegraphics[width=0.85\textwidth]{Figs/SPICAjob}
+\end{center}
+\end{columns}
+\begin{block}{}
+How to compute the transmission limits?
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Example from Sweden - 3}
+\begin{center}
+\includegraphics[height=6cm,width=0.75\textwidth]{Figs/SpicaResults.png}
+
+\footnotesize{Source: Sandberg, L., \& Roudén, K. (1992). \textit{The real-time supervision of transmission capacity in the swedish grid}. In S. C. Savulescu (Ed.), \textit{Real-time stability assessment in modern power system control centers}.}
+\end{center}
+\end{frame}
+
 
 \begin{frame}[label=example]
 \frametitle{Example of voltage instability - 1}
@@ -133,6 +235,18 @@ Dashed=Fault on line between buses 8 and 9.
 \end{columns}
 \end{frame}
 
+\begin{frame}
+\frametitle{Example of voltage instability - 4}
+\begin{columns}
+\begin{column}{0.5\textwidth}
+\includegraphics[width=1\textwidth]{Figs/Hasle.png}    
+\end{column}
+\begin{column}{0.5\textwidth}
+\includegraphics[width=1\textwidth]{Figs/SecurityLimits_emphasis.png}
+\end{column}
+\end{columns}  
+\end{frame}
+
 
 \section{History}
 
@@ -142,6 +256,11 @@ Dashed=Fault on line between buses 8 and 9.
   \begin{quote}
     Over the past decade, voltage instability has initiated several severe power system disruptions. Such incidents are likely to increase with increases in transmission line loadings. However, no theoretical or practical body of knowledge is available to meet the needs of power system planners and operators
   \end{quote}
+\end{frame}
+
+\begin{frame}
+  \frametitle{History, cont.}
+Add some historical blackouts.
 \end{frame}
 
 \begin{frame}
