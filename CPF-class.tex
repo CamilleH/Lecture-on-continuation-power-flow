@@ -70,12 +70,6 @@
 \section[Volt. Stab.]{Voltage stability}
 
 \subsection{Recap}
-
-\begin{frame}
-  \frametitle{PV and QV curves}
-  
-\end{frame}
-
 \begin{frame}
   \frametitle{The onion curve}
   \begin{itemize}
@@ -84,10 +78,38 @@
 \item Load bus: load $S = P+jQ$.
 \item Transmission line: resistance = 0, reactance = X.
 \item Closed-form solution of the voltage magnitude at the load bus:
-  \begin{align}
-    \label{eq:11}
+  \begin{align*}
     \frac{V}{E} = \sqrt{\frac{1}{2}-\frac{QX}{E^2} \pm \sqrt{\frac{1}{4}-\left( \frac{XP}{E^2} \right)^2 - \frac{XQ}{E^2}}}
-  \end{align}
+  \end{align*}
+  \end{itemize}
+See Matlab files of the lectures at: \url{https://github.com/CamilleH/Lecture-on-continuation-power-flow}
+\end{frame}
+
+\begin{frame}
+  \frametitle{PV and QV curves}
+Most important questions: 
+\begin{itemize}
+\item<1-> What are you trying to do when you plot/compute PV and QV curves?  
+\item<2-> What are the assumptions behind these curves?
+\item<3-> PV curves: how the voltages in the system change when the loads in the system change? Loads can change in both active and reactive power.
+\item<4-> QV curves: how much reactive compensation is needed at a particular bus? Only reactive power changes at one particular buses are studied.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Load models}
+  \begin{itemize}
+  \item The active and reactive power consumptions of the loads depend voltage and demand.
+  \item Load demand and active and reactive power consumptions are different quantities.
+  \end{itemize}
+  \begin{align*}
+    P = P(z,V)\\
+    Q = Q(z,V)
+  \end{align*}
+  \begin{itemize}
+  \item Individual loads can be modelled by the exponential load model.
+  \item The model of the aggregate of several loads is the sum of the models of the individual loads.
+  \item The parameters of the models \underline{are obtained by measurements}.
   \end{itemize}
 \end{frame}
 
