@@ -71,7 +71,47 @@ for i = 1:nb_demand
     q_charac = Q_exp(demand(i),v_range);
     figure(onionfig2);
     hold on;
-    all_load_charac(i) = plot3(p_charac,q_charac,v_range);
+    all_load_charac(i) = plot3(p_charac,q_charac,v_range,'LineWidth',2);
 end
 legend(all_load_charac,demand_lgd);
 title('Exponential load model');
+
+%% Load characteristics for different types of loads
+alpha = [1.54;0.5;0.08;2.59];
+beta = [NaN;2.5;1.6;4.06];
+load_names = {'Incandescent lamps';'Room air conditioner';...
+    'Furnace fan';'Battery charger'};
+load_nb = length(alpha);
+P0 = 0.3;
+Q0 = 0.2*P0;
+V0 = 1;
+z = 1;
+% Exponential load models
+P_exp = @(V,alpha) (z*P0*(V/V0).^alpha);
+Q_exp = @(V,beta) (z*Q0*(V/V0).^beta);
+% Range of load voltages
+v_range = linspace(Vlim(1),Vlim(2),30);
+% Getting the onion figure
+onionfig3 = get_onion_curve(Plim,Qlim,Vh,Vl);
+line_handles = zeros(load_nb,1);
+% PV characteristics
+loadpvfig = figure;
+for i = 1:load_nb
+    P_load = P_exp(v_range,alpha(i));
+    Q_load = Q_exp(v_range,beta(i));
+    if all(isnan(Q_load))
+        Q_load(1:end) = 0;
+    end
+    figure(onionfig3);
+    hold on
+    line_handles(i) = plot3(P_load,Q_load,v_range,'LineWidth',2);
+    figure(loadpvfig);
+    hold on
+    plot(P_load,v_range,'LineWidth',2);
+end
+figure(loadpvfig);
+xlabel('P');
+ylabel('V');
+legend(load_names);
+figure(onionfig3);
+legend(line_handles,load_names);

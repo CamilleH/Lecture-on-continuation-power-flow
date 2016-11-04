@@ -1,5 +1,5 @@
 % This file illustrates the effect of the power factor
-
+close all;clc;clear;
 % Defining the bounds of active and reactive power
 Plim = [0 0.8];
 Qlim = [-0.4 0.3];
@@ -20,7 +20,7 @@ nb_row = floor((nb_tanphi-1)/2)+1;
 nb_col = 2;
 for i = 1:nb_tanphi
     plotRectangle(tanphi(i),onionfig);
-    Pvals = P;
+    Pvals = linspace(Plim(1),Plim(2),100);
     Qvals = Pvals*tanphi(i);
     Vl_sol = Vl(Pvals,Qvals);
     Vh_sol = Vh(Pvals,Qvals);

@@ -46,7 +46,7 @@
 
 \title{Continuation Power Flow\\Advanced power system analysis}
 \author{Camille Hamon\\camille.hamon@ntnu.no}
-\date{13 October 2015}
+\date{8 November 2016}
 
 % \AtBeginSection[] % Do nothing for \subsection*
 % {
@@ -59,8 +59,11 @@
 \begin{document}
 \begin{frame}[plain]
   \titlepage
+{\footnotesize (Slides and Matlab files: \url{https://github.com/CamilleH/Lecture-on-continuation-power-flow})}
+\end{frame}
 
-\blockquote[\textbf{January 1989}, EPRI, “Proceedings: Bulk Power System Voltage Phenomena - Voltage Stability and Security.”]{Over the past decade, voltage instability has initiated several severe power system disruptions. Such incidents are likely to increase with increases in transmission line loadings. However, no theoretical or practical body of knowledge is available to meet the needs of power system planners and operators}
+\begin{frame}[plain]
+\blockquote[\textbf{January 1989}, EPRI, “Proceedings: Bulk Power System Voltage Phenomena - Voltage Stability and Security.”]{Over the past decade, voltage instability has initiated several severe power system disruptions. Such incidents are likely to increase with increases in transmission line loadings. However, no theoretical or practical body of knowledge is available to meet the needs of power system planners and operators}  
 \end{frame}
 
 \begin{frame}{Outline}
@@ -82,7 +85,6 @@
     \frac{V}{E} = \sqrt{\frac{1}{2}-\frac{QX}{E^2} \pm \sqrt{\frac{1}{4}-\left( \frac{XP}{E^2} \right)^2 - \frac{XQ}{E^2}}}
   \end{align*}
   \end{itemize}
-See Matlab files of the lectures at: \url{https://github.com/CamilleH/Lecture-on-continuation-power-flow}
 \end{frame}
 
 \begin{frame}
@@ -106,11 +108,35 @@ Most important questions:
     P = P(z,V)\\
     Q = Q(z,V)
   \end{align*}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Load models - 2}
+\begin{columns}
+\begin{column}{0.5\textwidth}
   \begin{itemize}
-  \item Individual loads can be modelled by the exponential load model.
+  \item Individual loads can be modelled by the exponential load model.\\
+$P = zP_0 \left( \frac{V}{V_0} \right)^\alpha$,\\
+$Q = z Q_0 \left( \frac{V}{V_0} \right)^\beta$
   \item The model of the aggregate of several loads is the sum of the models of the individual loads.
   \item The parameters of the models \underline{are obtained by measurements}.
-  \end{itemize}
+  \end{itemize}  
+\end{column}
+\begin{column}{0.5\textwidth}
+      \begin{tabular}{ccc}
+\toprule
+Load & $\alpha$ & $\beta$ \\
+\midrule
+incandescent lamps & 1.54 & - \\
+room air conditioner & 0.5 & 2.5 \\
+furnace fan & 0.08 & 1.6 \\
+battery charger & 2.59 & 4.06 \\
+\bottomrule
+      \end{tabular}
+(Van Cutsem and Vournas, 1998)\\
+See Matlab code
+    \end{column}
+  \end{columns}
 \end{frame}
 
 \begin{frame}

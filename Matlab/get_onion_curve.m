@@ -41,3 +41,15 @@ zlabel('$\frac{V}{E}$','Interpreter','latex');
 xlim(Plim);
 ylim(Qlim);
 
+% Add a thick black line for the maximum loadability points
+Vmax = @(phi) (1./(sqrt(2)*sqrt(1+sin(phi))));
+Pmax = @(phi) (cos(phi)./(2*(1+sin(phi))));
+Qmax = @(phi) (sin(phi)./(2*(1+sin(phi))));
+tanphi = linspace(-0.3/0.8,10,30);
+phi = atan(tanphi);
+figure(onionfig);
+hold on;
+% Plot the maximum loadability limits
+plot3(Pmax(phi),Qmax(phi),Vmax(phi),'b','LineWidth',2);
+% Projection on the (P,Q) plane
+plot3(Pmax(phi),Qmax(phi),zeros(1,length(phi)),'b:','LineWidth',2);
