@@ -19,7 +19,7 @@ pvfig = figure;
 nb_row = floor((nb_tanphi-1)/2)+1;
 nb_col = 2;
 for i = 1:nb_tanphi
-    plotRectangle(tanphi(i),onionfig);
+    plot_rectangle(tanphi(i),onionfig);
     Pvals = linspace(Plim(1),Plim(2),100);
     Qvals = Pvals*tanphi(i);
     Vl_sol = Vl(Pvals,Qvals);

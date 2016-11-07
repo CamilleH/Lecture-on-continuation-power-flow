@@ -1,4 +1,4 @@
-function plotRectangle(tanphi,hfig)
+function plot_rectangle(tanphi,hfig)
 Plim = [0,0.8];
 Qlim = [-0.4,0.3];
 Vlim = [0,1.4];

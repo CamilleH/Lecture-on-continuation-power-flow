@@ -40,6 +40,7 @@ ylabel('$\frac{QX}{E^2}$','Interpreter','latex');
 zlabel('$\frac{V}{E}$','Interpreter','latex');
 xlim(Plim);
 ylim(Qlim);
+view(39,50);
 
 % Add a thick black line for the maximum loadability points
 Vmax = @(phi) (1./(sqrt(2)*sqrt(1+sin(phi))));

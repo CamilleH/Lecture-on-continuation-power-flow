@@ -40,7 +40,7 @@
 {
    \begin{frame}
         \frametitle{Agenda}
-        \tableofcontents[currentsection]
+        \tableofcontents[currentsection,subsectionstyle=hide]
    \end{frame}
 }
 
@@ -71,8 +71,6 @@
 \end{frame}
 
 \section[Volt. Stab.]{Voltage stability}
-
-\subsection{Recap}
 \begin{frame}
   \frametitle{The onion curve}
   \begin{itemize}
@@ -84,67 +82,43 @@
   \begin{align*}
     \frac{V}{E} = \sqrt{\frac{1}{2}-\frac{QX}{E^2} \pm \sqrt{\frac{1}{4}-\left( \frac{XP}{E^2} \right)^2 - \frac{XQ}{E^2}}}
   \end{align*}
+\item The onion curve gives all operating points in which the grid can operate. Note that we did not make assumptions on the load models (i.e. no assumption on the expressions of $P$ and $Q$) $\Rightarrow$ see example in Matlab.
   \end{itemize}
 \end{frame}
 
 \begin{frame}
   \frametitle{PV and QV curves}
 Most important questions: 
-\begin{itemize}
-\item<1-> What are you trying to do when you plot/compute PV and QV curves?  
-\item<2-> What are the assumptions behind these curves?
-\item<3-> PV curves: how the voltages in the system change when the loads in the system change? Loads can change in both active and reactive power.
-\item<4-> QV curves: how much reactive compensation is needed at a particular bus? Only reactive power changes at one particular buses are studied.
+\begin{itemize}[<visible@+->]
+\item What are you trying to do when you plot/compute PV and QV curves?  
+\item What are the assumptions behind these curves?
+\item PV curves: how the voltages in the system change when the loads in the system change? Loads can change in both active and reactive power $\Rightarrow$ do not forget that reactive power plays a major role.
+\item QV curves: how much reactive compensation is needed at a particular bus? Only reactive power changes at one particular buses are studied.
+\item See Matlab example.
 \end{itemize}
 \end{frame}
 
 \begin{frame}
-  \frametitle{Load models}
-  \begin{itemize}
-  \item The active and reactive power consumptions of the loads depend voltage and demand.
-  \item Load demand and active and reactive power consumptions are different quantities.
-  \end{itemize}
-  \begin{align*}
-    P = P(z,V)\\
-    Q = Q(z,V)
-  \end{align*}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Load models - 2}
-\begin{columns}
-\begin{column}{0.5\textwidth}
-  \begin{itemize}
-  \item Individual loads can be modelled by the exponential load model.\\
-$P = zP_0 \left( \frac{V}{V_0} \right)^\alpha$,\\
-$Q = z Q_0 \left( \frac{V}{V_0} \right)^\beta$
-  \item The model of the aggregate of several loads is the sum of the models of the individual loads.
-  \item The parameters of the models \underline{are obtained by measurements}.
-  \end{itemize}  
-\end{column}
-\begin{column}{0.5\textwidth}
-      \begin{tabular}{ccc}
-\toprule
-Load & $\alpha$ & $\beta$ \\
-\midrule
-incandescent lamps & 1.54 & - \\
-room air conditioner & 0.5 & 2.5 \\
-furnace fan & 0.08 & 1.6 \\
-battery charger & 2.59 & 4.06 \\
-\bottomrule
-      \end{tabular}
-(Van Cutsem and Vournas, 1998)\\
-See Matlab code
-    \end{column}
-  \end{columns}
+\frametitle{Stability of operating points on the PV curve}
+  \setlength\fheight{0.3\textheight} 
+\setlength\fwidth{0.6\textwidth}
+\input{PVcurve}
+\begin{itemize}
+\item Are the points on the upper part of the PV curve stable? Why?
+\item Are the points on the lower part of the PV curve stable? Why?
+\end{itemize}
 \end{frame}
 
 \begin{frame}
   \frametitle{Voltage stability}
   \begin{itemize}
+  \item There is a loading point beyond which the system cannot supply more power. (What happens beyond this point?)
   \item Load dynamics are critical to study voltage stability.
-  \item There is a loading point beyond which the system becomes unstable. (What happens beyond this point?)
+  \item However, for drawing PV curves, we do not consider load dynamics.
+  \item PV curves show what the grid can supply, irrespective of the load dynamics.
   \end{itemize}
+\setlength\fheight{0.3\textheight} 
+\setlength\fwidth{0.6\textwidth}
 \input{PVcurve}
 \end{frame}
 
@@ -161,8 +135,6 @@ See Matlab code
 \setlength\fwidth{0.6\textwidth}
 \input{PVcurve}
 \end{frame}
-
-\subsection{Example}
 
 \begin{frame}
 \frametitle{Stability constraints (remember?)}
@@ -295,6 +267,19 @@ Dashed=Fault on line between buses 8 and 9.
 \end{columns}  
 \end{frame}
 
+\begin{frame}
+  \frametitle{Questions}
+  \begin{itemize}[<visible@+->]
+  \item What do onion figures show?
+  \item Operating points (P,Q) that can be supplied by the network, and corresponding voltages in the network.
+  \item Do we neglect Q when drawing PV curves?
+  \item No! We assume Q is linked to P by a certain relationship (ex: contant power factor)
+  \item Are the operating points on the lower part of the PV curve stable?
+  \item I don't know. We need more detailed models of the loads to answer that question.
+  \item What assumptions do we made when drawing PV curves?
+  \item A certain relationship between P and Q for loads, slack buses (what generators maintain power balance)
+  \end{itemize}
+\end{frame}
 
 \section{History}
 
@@ -308,7 +293,9 @@ Dashed=Fault on line between buses 8 and 9.
 
 \begin{frame}
   \frametitle{History, cont.}
-Add some historical blackouts.
+\includegraphics[width=0.8\textwidth]{Figs/VoltageProblem.png}\\
+{\footnotesize D. T. Duong, 2016.}
+Many problem in the 1980s!
 \end{frame}
 
 \begin{frame}
@@ -391,13 +378,20 @@ with ($i$ is for iteration number, \emph{not} bus number)
    f_{\theta} & f_V
    \end{bmatrix}
 \end{align}
+\end{frame}
+
+\begin{frame}
+\frametitle{PV curves by repetitive load power flows}
 So why can't we use power flow computations for obtaining the PV curves?\\
-\visible<2>{
 \begin{enumerate}
 \item The Jacobian is singular at the nose point $\Rightarrow$ numerical problems as we get close to this point. 
 \item Convergence of NR method very sensitive to initial conditions $\Rightarrow$ can be difficult to get convergence even away from the nose point.
 \end{enumerate}
-}
+So if you are an operator and the power flow computations fail, you do not know if
+\begin{enumerate}
+\item The maximum loadability limit has been reached, or
+\item There were numerical issues with the power flow computations.
+\end{enumerate}
 \end{frame}
 
 \section[CPF]{Continuation power flow}
@@ -434,9 +428,8 @@ How to define a \alert{loading} and a \alert{loading increase} in power systems?
   \begin{itemize}
   \item Reactive power: typically, we assume constant power factor load (but the method can handle other models as well), so
     \begin{align}
-      Q_l = \text{diag}(\tan \phi) P_l = Q_l^0 + \lambda \cdot \text{diag}(\tan \phi) d 
+      Q_l = \tan \phi \cdot P_l = Q_l^0 + \lambda \cdot \tan \phi \cdot d 
     \end{align}
-  \item Note that $\text{diag} (\tan \phi)$ is simply a square matrix with the $\tan \phi_i$ on the diagonal
   \item For example, with $\tan \phi = Q_0/P_0 = 0.5$ for all loads, 
     \begin{align}
       Q_L =
@@ -468,7 +461,7 @@ How to define a \alert{loading} and a \alert{loading increase} in power systems?
       0 &= P_g^i - P_l^i - P_s^i(\theta,V), \quad \forall \text{ PV and PQ buses} \label{eq:pf-p} \\
       0 &= Q_g^i - Q_l^i - Q_s^i(\theta,V), \quad \forall \text{ PQ buses} \label{eq:pf-q}\\
       P_l &= P_l^0 + \lambda d \in R^n \label{eq:cpf-lambda} \\
-      Q_l &= Q_l^0 + \lambda \cdot \text{diag}(\tan \phi) d \label{eq:cpf-lambda-q}
+      Q_l &= Q_l^0 + \lambda \cdot \tan \phi \cdot d \label{eq:cpf-lambda-q}
     \end{align}
     \begin{center}
     \begin{tabular}{ccc}
@@ -829,6 +822,60 @@ Remember, problems with using PF calculations to trace the PV curve:
   \item When encountering a new problem, study other fields.
   \end{itemize}
 \end{frame}
+
+\begin{frame}
+  \frametitle{Load models}
+  \begin{itemize}
+  \item The active and reactive power consumptions of the loads depend voltage and demand.
+  \item Load demand and active and reactive power consumptions are different quantities.
+  \end{itemize}
+  \begin{align*}
+    P = P(z,V)\\
+    Q = Q(z,V)
+  \end{align*}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Load models - Individual loads}
+  \begin{itemize}
+  \item Individual loads can be modelled by the exponential load model.
+  \end{itemize}  
+  \begin{align*}
+    \label{eq:11}
+P = zP_0 \left( \frac{V}{V_0} \right)^\alpha,\\
+Q = z Q_0 \left( \frac{V}{V_0} \right)^\beta
+  \end{align*}
+\begin{tabular}{ccc}
+\toprule
+Load & $\alpha$ & $\beta$ \\
+\midrule
+incandescent lamps & 1.54 & - \\
+room air conditioner & 0.5 & 2.5 \\
+furnace fan & 0.08 & 1.6 \\
+battery charger & 2.59 & 4.06 \\
+\bottomrule
+\end{tabular}\\
+(Van Cutsem and Vournas, 1998)\\
+See example in Matlab.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Load models - aggregate loads}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+\only<1>{\includegraphics[width=\textwidth]{Figs/NordicPS.png}}
+\only<2->{\includegraphics[width=\textwidth]{Figs/HV-MV-transformer.png}}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+  \begin{itemize}
+  \item Where are your incandescent lamps, electric heating, ...?
+  \item<visible@2-> See from the high-voltage network, each ``load'' is actually one substation, i.e. an aggregation of loads at lower voltage levels beyond the transformer between high and lower voltage levels.
+  \item<visible@3> The parameters of the models for aggregate loads \underline{are obtained by measurements}. 
+  \end{itemize}      
+    \end{column}
+  \end{columns}
+\end{frame}
+
 
 \end{document}
 
