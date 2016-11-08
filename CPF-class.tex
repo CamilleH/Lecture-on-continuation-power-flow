@@ -39,14 +39,14 @@
 \AtBeginSection[]
 {
    \begin{frame}
-        \frametitle{Agenda}
+        \frametitle{Outline}
         \tableofcontents[currentsection]
    \end{frame}
 }
 
 \AtBeginSubsection[] {
     \begin{frame}
-\frametitle{Agenda}
+\frametitle{Outline}
     \tableofcontents[currentsection,currentsubsection]
     \end{frame}
 }
@@ -73,10 +73,6 @@
 \blockquote[\textbf{January 1989}, EPRI, “Proceedings: Bulk Power System Voltage Phenomena - Voltage Stability and Security.”]{Over the past decade, voltage instability has initiated several severe power system disruptions. Such incidents are likely to increase with increases in transmission line loadings. However, no theoretical or practical body of knowledge is available to meet the needs of power system planners and operators}  
 \end{frame}
 
-\begin{frame}{Outline}
-  \tableofcontents[subsectionstyle=hide]
-\end{frame}
-
 \section[Volt. Stab.]{Voltage stability}
 \begin{frame}
   \frametitle{the V-P-Q surface}
@@ -87,7 +83,7 @@
     \frac{V}{E} = \sqrt{\frac{1}{2}-\frac{QX}{E^2} \pm \sqrt{\frac{1}{4}-\left( \frac{XP}{E^2} \right)^2 - \frac{XQ}{E^2}}}
   \end{align*}
 \item The $V-P-Q$ surface gives all operating points in which the grid can operate. Note that we did not make assumptions on the load models (i.e. no assumption on the expressions of $P$ and $Q$) 
-\item We can make assumptions on the power factor: $Q=\tan \phi \cdot P)$
+\item We can make assumptions on the power factor: $Q=\tan \phi \cdot P$
 \item See example in Matlab (file \emph{study\_tanphi.m}).
   \end{itemize}
 \end{frame}
