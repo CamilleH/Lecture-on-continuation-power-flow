@@ -79,17 +79,25 @@
 
 \section[Volt. Stab.]{Voltage stability}
 \begin{frame}
-  \frametitle{The onion curve}
+  \frametitle{the V-P-Q surface}
   \begin{itemize}
-\item A lossless two-bus system (single-load infinite-bus systeme) is used for illustration purposes \textbf{only}.
-\item Infinite bus: voltage = $Ee^{j0}$.
-\item Load bus: load $S = P+jQ$.
-\item Transmission line: resistance = 0, reactance = X.
+\item A lossless two-bus system (single-load infinite-bus systeme) is used for illustration purposes \textbf{only}, with one infinite bus (voltage = $Ee^{j0}$), one load bus (load $S = P+jQ$) and one transmission line (resistance = 0, reactance = X).
 \item Closed-form solution of the voltage magnitude at the load bus:
   \begin{align*}
     \frac{V}{E} = \sqrt{\frac{1}{2}-\frac{QX}{E^2} \pm \sqrt{\frac{1}{4}-\left( \frac{XP}{E^2} \right)^2 - \frac{XQ}{E^2}}}
   \end{align*}
-\item The onion curve gives all operating points in which the grid can operate. Note that we did not make assumptions on the load models (i.e. no assumption on the expressions of $P$ and $Q$) $\Rightarrow$ see example in Matlab.
+\item The $V-P-Q$ surface gives all operating points in which the grid can operate. Note that we did not make assumptions on the load models (i.e. no assumption on the expressions of $P$ and $Q$) 
+\item We can make assumptions on the power factor: $Q=\tan \phi \cdot P)$
+\item See example in Matlab (file \emph{study\_tanphi.m}).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{V-P-Q surface, cont.}
+  \begin{itemize}
+  \item Apart from this very simple two-bus system, we do not know how to get the operating points in closed-form. 
+  \item What else can we use to get these points?
+  \item<visible@2-> Power flow computations, continuation power flow computations.
   \end{itemize}
 \end{frame}
 
@@ -101,15 +109,17 @@ Most important questions:
 \item What are the assumptions behind these curves?
 \item PV curves: how the voltages in the system change when the loads in the system change? Loads can change in both active and reactive power $\Rightarrow$ do not forget that reactive power plays a major role.
 \item QV curves: how much reactive compensation is needed at a particular bus? Only reactive power changes at one particular buses are studied.
-\item See Matlab example.
+\item See Matlab example (\emph{PV\_and\_QV\_curves.m}).
 \end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{Stability of operating points on the PV curve}
+\frametitle{Stability of operating points on the PV curve 1}
   \setlength\fheight{0.3\textheight} 
 \setlength\fwidth{0.6\textwidth}
 \input{PVcurve}
+
+Consider a constant power load.
 \begin{itemize}
 \item Are the points on the upper part of the PV curve stable? Why?
 \item Are the points on the lower part of the PV curve stable? Why?
@@ -117,15 +127,26 @@ Most important questions:
 \end{frame}
 
 \begin{frame}
-\frametitle{Stability of operating points on the PV curve}
-  \setlength\fheight{0.3\textheight} 
+\frametitle{Stability of operating points on the PV curve 2}
+\setlength\fheight{0.3\textheight} 
 \setlength\fwidth{0.6\textwidth}
 \input{PVcurve}
-\begin{itemize}
+\begin{itemize}[<visible@+->]
 \item What can drive voltage instability? i.e. why would we get to the unstable parts in the first place?
-\end{itemize}
+\item Load build-up (ex: in the morning when people wake up), sudden disturbance (contingency), reactive power limits of generators encountered, \ldots
+\end{itemize} 
 \end{frame}
 
+\begin{frame}
+\frametitle{Stability of operating points on the PV curve 3}
+\setlength\fheight{0.3\textheight} 
+\setlength\fwidth{0.6\textwidth}
+\input{PVcurve}
+\begin{itemize}[<visible@+->]
+\item What can be consequences of having operating points with low voltages (even if they are stable)?
+\item Protection systems will start disconnecting equipement (generators for example) which will make the system even more constrained..
+\end{itemize} 
+\end{frame}
 
 \begin{frame}
   \frametitle{Voltage stability}
@@ -329,14 +350,18 @@ Many problem in the 1980s!
 And many, many other contributors \ldots
 \end{frame}
 
-\begin{frame}
-  \frametitle{To come today}
-Add a figure to show that CPF relies heavily on PF and NR.
-\end{frame}
-
 \section[NR method]{Newton-Raphson method}
 \label{sec:newt-raphs-meth}
 
+\begin{frame}
+  \frametitle{Why do we need it?}
+  \begin{itemize}
+  \item The Newton-Raphson method is a method to compute $x^{*}$ such that $f(x^{*})=0$.
+  \item Why do we need it?
+  \item<visible@2-> Power flows boil down to computing voltage angles and magnitudes such that power flow equations are fulfilled.
+  \item<visible@3-> We'll see that it comes handy for CPF computations as well.
+  \end{itemize}
+\end{frame}
 
 \begin{frame}
   \frametitle{Newton-Raphson method}
@@ -814,8 +839,17 @@ where the Jacobian of \eqref{eq:corr-eq-1}--\eqref{eq:corr-eq-3} is
   \end{itemize}
 \end{frame}
 
-\subsection{Problems addressed by CPF}
+\begin{frame}
+  \frametitle{Question, cont.}
+  \begin{itemize}[<visible@+->]
+  \item What does the continuation parameter control?
+  \item Two things: (1) How the prediction step is made (step in loading, or step in voltage) and (2) What the correction step keeps constant (the additional equation compared to power flow equations)
+  \item Why do we want to switch the continuation parameter?
+  \item Two things: Switching to voltage allows us to (1) make finer guesses in the prediction step (we control how much voltages decrease) and (2) obtain solutions in the correction step when the predicted loading is beyond the nose point.
+  \end{itemize}
+\end{frame}
 
+\subsection{Problems addressed by CPF}
 
 \begin{frame}
   \frametitle{Around the nose point}
@@ -894,7 +928,7 @@ Remember, problems with using PF calculations to trace the PV curve:
   \frametitle{Take-home messages}
   \begin{itemize}
   \item Understand the Newton-Raphson method and how to use it.
-  \item The principles of and intuition behind CPF are simple.
+  \item The principles and intuition behind CPF are simple.
   \item The maths are important. Link intuition to maths! Important to be able to write down intuitions as mathematical formulations.
   \item Keep track of what has a physical meaning and what is just math (predictor step, for example, is a mathematical construction, although the tangent vector does have a physical interpretation)
   \item Keep track of indices, variables, Jacobians \ldots Easy to get lost!
@@ -921,7 +955,7 @@ Remember, problems with using PF calculations to trace the PV curve:
     \begin{column}{0.5\textwidth}
   \begin{itemize}
   \item Individual loads can be modelled by the exponential load model.
-  \item See example in Matlab.
+  \item See example in Matlab (file \emph{study\_load\_models.m}).
   \end{itemize}  
   \begin{align*}
     \label{eq:11}
