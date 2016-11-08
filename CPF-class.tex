@@ -140,7 +140,7 @@ Consider a constant power load.
 \input{PVcurve}
 \begin{itemize}[<visible@+->]
 \item What can be consequences of having operating points with low voltages (even if they are stable)?
-\item Protection systems will start disconnecting equipement (generators for example) which will make the system even more constrained..
+\item Protection systems will start disconnecting equipement (generators for example) which will make the system even more constrained.
 \end{itemize} 
 \end{frame}
 
@@ -291,21 +291,9 @@ Dashed=Fault on line between buses 8 and 9.
 \end{frame}
 
 \begin{frame}
-\frametitle{Example of voltage instability - 4}
-\begin{columns}
-\begin{column}{0.5\textwidth}
-\includegraphics[width=1\textwidth]{Figs/Hasle.png}    
-\end{column}
-\begin{column}{0.5\textwidth}
-\includegraphics[width=1\textwidth]{Figs/SecurityLimits_emphasis.png}
-\end{column}
-\end{columns}  
-\end{frame}
-
-\begin{frame}
   \frametitle{Questions}
   \begin{itemize}[<visible@+->]
-  \item What do onion figures show?
+  \item What do $V-P-Q$ figures show?
   \item Operating points (P,Q) that can be supplied by the network, and corresponding voltages in the network.
   \item Do we neglect Q when drawing PV curves?
   \item No! We assume Q is linked to P by a certain relationship (ex: contant power factor)
@@ -590,8 +578,7 @@ Three main steps:
   \begin{align}
   z_{i+1}^p = [\theta_{i+1} \; V_{i+1} \; \lambda_{i+1} ]= z_{i} + s \cdot t_{i}  
   \end{align}
-\textbf{Question:} How is defined the tangent vector?
-
+\textbf{Question:} How is the tangent vector defined ?
 
 \textbf{More general question:} How to compute \emph{one} tangent vector to a surface described by $g(u) = 0$?
 
