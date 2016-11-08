@@ -40,8 +40,15 @@
 {
    \begin{frame}
         \frametitle{Agenda}
-        \tableofcontents[currentsection,subsectionstyle=hide]
+        \tableofcontents[currentsection]
    \end{frame}
+}
+
+\AtBeginSubsection[] {
+    \begin{frame}
+\frametitle{Agenda}
+    \tableofcontents[currentsection,currentsubsection]
+    \end{frame}
 }
 
 \title{Continuation Power Flow\\Advanced power system analysis}
@@ -110,9 +117,20 @@ Most important questions:
 \end{frame}
 
 \begin{frame}
+\frametitle{Stability of operating points on the PV curve}
+  \setlength\fheight{0.3\textheight} 
+\setlength\fwidth{0.6\textwidth}
+\input{PVcurve}
+\begin{itemize}
+\item What can drive voltage instability? i.e. why would we get to the unstable parts in the first place?
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
   \frametitle{Voltage stability}
   \begin{itemize}
-  \item There is a loading point beyond which the system cannot supply more power. (What happens beyond this point?)
+  \item There is a loading point beyond which the system cannot supply more power.
   \item Load dynamics are critical to study voltage stability.
   \item However, for drawing PV curves, we do not consider load dynamics.
   \item PV curves show what the grid can supply, irrespective of the load dynamics.
@@ -277,26 +295,26 @@ Dashed=Fault on line between buses 8 and 9.
   \item Are the operating points on the lower part of the PV curve stable?
   \item I don't know. We need more detailed models of the loads to answer that question.
   \item What assumptions do we made when drawing PV curves?
-  \item A certain relationship between P and Q for loads, slack buses (what generators maintain power balance)
+  \item A certain relationship between P and Q for loads, slack buses, generation at all PV buses, \ldots (what generators maintain power balance)
   \end{itemize}
 \end{frame}
 
 \section{History}
-
 \begin{frame}
   \frametitle{History}
+Many problem in the 1980s!
+\includegraphics[width=0.7\textwidth]{Figs/VoltageProblem.png}\\
+{\footnotesize From D. T. Duong, 2016, ``Online Voltage Stability Monitoring and Coordinated Secondary Voltage Control''}\\
+\end{frame}
+
+\begin{frame}
+  \frametitle{History, cont.}
 \textbf{January 1989}, EPRI, “Proceedings: Bulk Power System Voltage Phenomena - Voltage Stability and Security.”
   \begin{quote}
     Over the past decade, voltage instability has initiated several severe power system disruptions. Such incidents are likely to increase with increases in transmission line loadings. However, no theoretical or practical body of knowledge is available to meet the needs of power system planners and operators
   \end{quote}
 \end{frame}
 
-\begin{frame}
-  \frametitle{History, cont.}
-\includegraphics[width=0.8\textwidth]{Figs/VoltageProblem.png}\\
-{\footnotesize D. T. Duong, 2016.}
-Many problem in the 1980s!
-\end{frame}
 
 \begin{frame}
   \frametitle{History, cont.}
@@ -311,6 +329,10 @@ Many problem in the 1980s!
 And many, many other contributors \ldots
 \end{frame}
 
+\begin{frame}
+  \frametitle{To come today}
+Add a figure to show that CPF relies heavily on PF and NR.
+\end{frame}
 
 \section[NR method]{Newton-Raphson method}
 \label{sec:newt-raphs-meth}
@@ -333,12 +355,13 @@ And many, many other contributors \ldots
   \begin{enumerate}
   \item Set $x_i = x_0$;
   \item \textbf{While} $\norm{f(x_i)}> \epsilon$, \textbf{do}
-    \begin{align}
-      \label{eq:2}
-      x_{i+1} = x_i - \left(\nabla_x f(x_i) \right)^{-1} f(x_i)
-    \end{align}
+    \begin{align*}
+      x_{i+1} &= x_i - \left(\nabla_x f(x_i) \right)^{-1} f(x_i)\\
+      i &\leftarrow i+1
+    \end{align*}
   \item Hope that you guessed $x_0$ right so that the method converges.
   \end{enumerate}
+\only<2>{\underline{Question}: Can you think of one case in which this method will not work?}
 \end{frame}
 
 \section[Power flow]{Power flow computations by Newton-Raphson method}
@@ -383,15 +406,15 @@ with ($i$ is for iteration number, \emph{not} bus number)
 \begin{frame}
 \frametitle{PV curves by repetitive load power flows}
 So why can't we use power flow computations for obtaining the PV curves?\\
-\begin{enumerate}
+\visible<2->{\begin{enumerate}
 \item The Jacobian is singular at the nose point $\Rightarrow$ numerical problems as we get close to this point. 
 \item Convergence of NR method very sensitive to initial conditions $\Rightarrow$ can be difficult to get convergence even away from the nose point.
-\end{enumerate}
-So if you are an operator and the power flow computations fail, you do not know if
-\begin{enumerate}
-\item The maximum loadability limit has been reached, or
+\end{enumerate}}
+\visible<3->{So assume that you are an operator and the power flow computations fail, what can you conclude?}
+\visible<4->{\begin{enumerate}
+\item The maximum loadability limit (=nose point) has been reached, or
 \item There were numerical issues with the power flow computations.
-\end{enumerate}
+\end{enumerate}}
 \end{frame}
 
 \section[CPF]{Continuation power flow}
@@ -399,7 +422,7 @@ So if you are an operator and the power flow computations fail, you do not know 
 \subsection{Parametrizing the loading increase}
 \begin{frame}
   \frametitle{Parametrization of load increase}
-There is a \alert{loading} point beyond which the system becomes unstable.
+There is a \alert{loading} point beyond which the system cannot more power.
 How to define a \alert{loading} and a \alert{loading increase} in power systems?
   \begin{itemize}
   \item Add one parameter $\lambda \in \R$ to parametrize the load increase process in direction $d\in \R^n$:
@@ -428,7 +451,7 @@ How to define a \alert{loading} and a \alert{loading increase} in power systems?
   \begin{itemize}
   \item Reactive power: typically, we assume constant power factor load (but the method can handle other models as well), so
     \begin{align}
-      Q_l = \tan \phi \cdot P_l = Q_l^0 + \lambda \cdot \tan \phi \cdot d 
+      Q_l = \text{diag}(\tan \phi) \cdot P_l = Q_l^0 + \lambda \cdot \text{diag}(\tan \phi) \cdot d 
     \end{align}
   \item For example, with $\tan \phi = Q_0/P_0 = 0.5$ for all loads, 
     \begin{align}
@@ -461,7 +484,7 @@ How to define a \alert{loading} and a \alert{loading increase} in power systems?
       0 &= P_g^i - P_l^i - P_s^i(\theta,V), \quad \forall \text{ PV and PQ buses} \label{eq:pf-p} \\
       0 &= Q_g^i - Q_l^i - Q_s^i(\theta,V), \quad \forall \text{ PQ buses} \label{eq:pf-q}\\
       P_l &= P_l^0 + \lambda d \in R^n \label{eq:cpf-lambda} \\
-      Q_l &= Q_l^0 + \lambda \cdot \tan \phi \cdot d \label{eq:cpf-lambda-q}
+      Q_l &= Q_l^0 + \lambda \cdot \text{diag}(\tan \phi) \cdot d \label{eq:cpf-lambda-q}
     \end{align}
     \begin{center}
     \begin{tabular}{ccc}
@@ -491,7 +514,7 @@ The CPF is a predictor-corrector process:
 \begin{figure}[!h]
   \centering
   \includegraphics[width=0.4\textwidth]{CPFprocess.pdf}
-  \caption{CPF process, from Ajjarapu and Christy, “The Continuation Power Flow: A Tool for Steady State Voltage Stability Analysis.”}
+  \caption{CPF process, from Ajjarapu and Christy, 1992, “The Continuation Power Flow: A Tool for Steady State Voltage Stability Analysis.”}
   \label{fig:CPFprocess}
 \end{figure}
 \end{frame}
@@ -500,14 +523,14 @@ The CPF is a predictor-corrector process:
   \frametitle{Steps in CPF}
 Three main steps:
 \begin{enumerate}
-\item Predictor step: From a known operating point $z_i$ (ex: previously corrected), take a step in the direction of the tangent vector $t_{i}$.
+\item Predictor step: From a known operating point $z_i$ (ex: previously corrected), take a step of length $s$ in the direction of the tangent vector $t_{i}$.
   \begin{align}
   z_{i+1}^p = [\theta_{i+1} \; V_{i+1} \; \lambda_{i+1} ]= z_{i} + s \cdot t_{i}  
   \end{align}
 \end{enumerate}
 \textbf{Notes:}
 \begin{itemize}
-\item  The predicted point does not correspond to a physical operating point. 
+\item  The predicted point does \textbf{not} correspond to a physical operating point. 
 \item It is a mathematical construction to estimate the values of $z=[\theta \; V \; \lambda]$ after taking a step of length $s$ in direction $d$ (in the load space = $P_l$-space).
 \item It gives a good initial guess of $z$ before the corrector step.
 \end{itemize}
@@ -606,10 +629,13 @@ is a tangent vector.
   \frametitle{Tangent vector to power flow equations, cont.}
   \begin{itemize}
   \item We need one more equation to specify which tangent vector, among all possible satisfying \eqref{eq:tangent-vectors}, we want to obtain.
-  \item Typically, we want one component $k$ in $v$ to be equal to one, so 
+  \item Typically, we want one component $k$ in $t$ to be equal to one, so 
     \begin{align}
       \label{eq:10}
-      t_k = \pm 1
+      t_k = \begin{cases}
+1 & \text{if we take a step towards} +\lambda \\
+-1 & \text{if we take a step towards} -\lambda \text{ or } -V_k \\
+      \end{cases}
     \end{align}
   \end{itemize}
  Combining everything:
@@ -620,7 +646,7 @@ is a tangent vector.
    & e_k^T & 
   \end{bmatrix} t = \pm e_{2n+1}
 \end{align}
-where $e_j$ is the $j$-th column of the identity matrix $I_{2n+1}$.
+where $e_j$ is the $j$-th column of the identity matrix $I_{j}$.
 \end{frame}
 
 \begin{frame}
@@ -634,7 +660,7 @@ Combining everything:
    & e_k^T & 
   \end{bmatrix} t = Bt = \pm e_{2n+1}
 \end{align}
-where $e_j$ is the $j$-th column of the identity matrix $I_{2n+1}$, and $B$ is just the matrix on the left.
+where $e_j$ is the $j$-th column of the identity matrix $I_{j}$, and $B$ is just the matrix on the left.
 
 \textbf{Solving \eqref{eq:tangent-vectors-2}}: Simply use the inverse of matrix on the left: $t = B^{-1} (\pm e_{2n+1})$.
 
@@ -645,6 +671,47 @@ where $e_j$ is the $j$-th column of the identity matrix $I_{2n+1}$, and $B$ is j
 
 \begin{frame}
   \frametitle{Tangent vector, example}
+\only<1>{Tangent vector to take a step towards increasing $\lambda$ (upper part of the PV curve):
+\begin{align*}
+  \begin{bmatrix}
+  \frac{\partial \Delta P}{\partial \theta} & \frac{\partial \Delta P}{\partial V} & d \\
+  \frac{\partial \Delta Q}{\partial \theta} & \frac{\partial \Delta Q}{\partial V} & \text{diag}(\tan \phi) \cdot d \\
+ 0  & 0 & 1
+  \end{bmatrix} t =  \begin{bmatrix}
+0 \\
+0 \\
+1
+  \end{bmatrix}
+\end{align*}}
+\only<2>{Tangent vector to take a step towards decreasing $V_k$ (when close to the nose point):
+\begin{align*}
+  \begin{bmatrix}
+  \frac{\partial \Delta P}{\partial \theta} & \frac{\partial \Delta P}{\partial V} & d \\
+  \frac{\partial \Delta Q}{\partial \theta} & \frac{\partial \Delta Q}{\partial V} & \text{diag}(\tan \phi) \cdot d \\
+ 0  & 1_k & 0
+  \end{bmatrix} t =  \begin{bmatrix}
+0 \\
+0 \\
+-1
+  \end{bmatrix}
+\end{align*}
+$-1_k$ means 1 at the $k$-th element and 0 elsewhere.} 
+\only<3>{Tangent vector to take a step towards decreasing $\lambda$ (lower part of the PV curve):
+\begin{align*}
+  \begin{bmatrix}
+  \frac{\partial \Delta P}{\partial \theta} & \frac{\partial \Delta P}{\partial V} & d \\
+  \frac{\partial \Delta Q}{\partial \theta} & \frac{\partial \Delta Q}{\partial V} & \text{diag}(\tan \phi) \cdot d \\
+ 0  & 0 & 1
+  \end{bmatrix} t =  \begin{bmatrix}
+0 \\
+0 \\
+-1
+  \end{bmatrix}
+\end{align*}}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Tangent vector in Matlab}
   Matlab example.
 \end{frame}
 
@@ -703,6 +770,7 @@ where $e_j$ is the $j$-th column of the identity matrix $I_{2n+1}$, and $B$ is j
       0 &= Q_g - (Q_l^0 + \lambda_{i+1} \cdot \text{diag}(\tan \phi) d)- Q_s(\theta_{i+1},V_{i+1}), \\
       0 &= z_{i+1}^{k}-z_{i+1}^{k,p}
 \end{align}
+to get $z_{i+1}=[\theta_{i+1} \; V_{i+1} \; \lambda_{i+1}]$.\\
 \textbf{Question:} How to solve this? \only<2>{using Newton-Raphson method}
   \end{itemize}
 \end{frame}
@@ -719,7 +787,7 @@ where $e_j$ is the $j$-th column of the identity matrix $I_{2n+1}$, and $B$ is j
 \item $j$-th iteration in Newton-Raphson:
 \begin{align}
   \label{eq:3}
-  z_{i+1,j+1} = - J_\text{aug}(z_{i+1,j})^{-1} f(z_{i+1,j})
+  z_{i+1,j+1} = z_{i+1,j} - J_\text{aug}(z_{i+1,j})^{-1} f(z_{i+1,j})
 \end{align}
 where the Jacobian of \eqref{eq:corr-eq-1}--\eqref{eq:corr-eq-3} is
 \begin{align}
@@ -734,7 +802,20 @@ where the Jacobian of \eqref{eq:corr-eq-1}--\eqref{eq:corr-eq-3} is
 \textbf{Note:} Easy to mix up all indices ($i$,$k$,$j$)!
 \end{frame}
 
+\begin{frame}
+  \frametitle{Questions}
+  \begin{itemize}[<visible@+->]
+  \item What is the use of the prediction step?
+  \item It allows us to get an estimate (prediction) of the system state when taking a step (towards increased/decreased loading or decreased voltage). Getting a prediction of the system state allows the correction step to converge better (thanks to the good initial point provided by the prediction step).
+  \item What does the predicted point correspond to physically?
+  \item It is certainly \textbf{not} a valid operating point. It is a ``first-order'' estimate of what the system state will be.
+  \item What information does the tangent vector carry?
+  \item Its elements show how the voltage angles, magnitudes and loading vary when taking a step (toward different loading, different voltages, \ldots)
+  \end{itemize}
+\end{frame}
+
 \subsection{Problems addressed by CPF}
+
 
 \begin{frame}
   \frametitle{Around the nose point}
@@ -766,7 +847,7 @@ Close to the nose point, $J_\text{aug}$ would also be close to singular.
   \frametitle{Importance of the continuation parameter}
   The continuation parameter helps in two different ways
   \begin{enumerate}
-  \item Predictor step: $t_k = \pm 1$ helps controlling the fastest changing variable when we take a step.
+  \item Predictor step: $t_k = \pm 1$ helps control the fastest changing variable when we take a step.
   \item Corrector step: Choosing another continuation parameter than $\lambda$ ensures that the corrector step is numerically stable (Jacobian in the Newton-Raphson process not close to singular)
   \end{enumerate}
 \end{frame}
@@ -794,7 +875,6 @@ Remember, problems with using PF calculations to trace the PV curve:
   \begin{itemize}
   \item Reactive power limits.
   \item How to choose the step size $s$.
-  \item How to interpret and use the tangent vector.
   \item Other load models.
   \item Incorporating load dynamics, generator dynamics, etc
   \end{itemize}
@@ -837,14 +917,19 @@ Remember, problems with using PF calculations to trace the PV curve:
 
 \begin{frame}
   \frametitle{Load models - Individual loads}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
   \begin{itemize}
   \item Individual loads can be modelled by the exponential load model.
+  \item See example in Matlab.
   \end{itemize}  
   \begin{align*}
     \label{eq:11}
 P = zP_0 \left( \frac{V}{V_0} \right)^\alpha,\\
 Q = z Q_0 \left( \frac{V}{V_0} \right)^\beta
   \end{align*}
+    \end{column}
+    \begin{column}{0.5\textwidth}
 \begin{tabular}{ccc}
 \toprule
 Load & $\alpha$ & $\beta$ \\
@@ -855,8 +940,10 @@ furnace fan & 0.08 & 1.6 \\
 battery charger & 2.59 & 4.06 \\
 \bottomrule
 \end{tabular}\\
-(Van Cutsem and Vournas, 1998)\\
-See example in Matlab.
+(Van Cutsem and Vournas, 1998)\\      
+    \end{column}
+  \end{columns}
+
 \end{frame}
 
 \begin{frame}
